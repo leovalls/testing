@@ -8,6 +8,8 @@ on:
   schedule:
    # - cron: '0 0 * * *' # Runs every day at midnight
     - cron: '*/5 * * * *' # Runs every day at midnight
+  pull_request:
+    types: [labeled]
 
 jobs:
   autoupdate:
