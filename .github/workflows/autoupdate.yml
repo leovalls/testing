@@ -1,6 +1,7 @@
 name: autoupdate
 
 on:
+  workflow_dispatch:
   schedule:
    # - cron: '0 0 * * *' # Runs every day at midnight
     - cron: '*/5 * * * *' # Runs every day at midnight
@@ -11,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: read
 
 
     # if: github.event_name == 'push' && contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
@@ -27,4 +29,21 @@ jobs:
           git config --global user.email 'autoupdate-bot@xxx.digital'
           git push origin ${GITHUB_REF}
 
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
+    steps:
+      - name: 'Comment PR'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'This is a test of a comment!!!'
+            })
+          
