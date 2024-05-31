@@ -1,0 +1,30 @@
+name: autoupdate
+
+on:
+  schedule:
+   # - cron: '0 0 * * *' # Runs every day at midnight
+    - cron: '*/5 * * * *' # Runs every day at midnight
+
+jobs:
+  autoupdate:
+    name: autoupdate
+    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+
+
+    # if: github.event_name == 'push' && contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
+    if: contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update branch
+        run: git pull origin master
+
+      - name: Push changes
+        run: |
+          git config --global user.name 'autoupdate-bot'
+          git config --global user.email 'autoupdate-bot@xxx.digital'
+          git push origin ${GITHUB_REF}
+
+
