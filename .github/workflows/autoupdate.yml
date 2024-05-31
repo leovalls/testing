@@ -9,8 +9,8 @@ jobs:
   autoupdate:
     name: autoupdate
     runs-on: ubuntu-latest
-#    permissions:
-#      contents: read
+    permissions:
+      contents: read
 
 
     # if: github.event_name == 'push' && contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
