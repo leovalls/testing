@@ -1,35 +1,42 @@
 name: autoupdate
 
 on:
-  workflow_dispatch:
-  pull_request_target:
-    types:
-      - opened
   schedule:
-   # - cron: '0 0 * * *' # Runs every day at midnight
-   # - cron: '*/5 * * * *' # Runs every day at midnight
+   - cron: '*/5 * * * *' 
 
 jobs:
   autoupdate:
-    name: auto_update_branch
+    name: autoupdate
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
+      contents: write
+      pull-requests: write
 
-
-    if: contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
-    steps:
+    if:  github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
+    steps:      
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
 
       - name: Update branch
-        run: git pull origin main
+        run: |
+          git checkout ${{steps.extract_branch.outputs.branch}}
+          git config pull.rebase false
+          git config --global user.name 'autoupdate-bot'
+          git config --global user.email 'autoupdate-bot@xxxl.digital'
+          git pull origin master -X ours
 
       - name: Push changes
         run: |
+          git checkout  ${{steps.extract_branch.outputs.branch}}
           git config --global user.name 'autoupdate-bot'
-          git config --global user.email 'autoupdate-bot@xxx.digital'
-          git push origin ${GITHUB_REF}
+          git config --global user.email 'autoupdate-bot@xxxl.digital'
+          git push origin ${{steps.extract_branch.outputs.branch}}
 
   comment:
     runs-on: ubuntu-latest
