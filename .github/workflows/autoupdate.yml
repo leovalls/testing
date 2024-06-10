@@ -3,6 +3,7 @@ name: autoupdate
 on:
   schedule:
    - cron: '*/5 * * * *' 
+  pull_request:
 
 jobs:
   autoupdate:
@@ -12,30 +13,20 @@ jobs:
       contents: write
       pull-requests: write
 
-    if:  github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'update-once-a-day')
     steps:      
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Extract branch name
+      - name: Update labeled brances
         shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
-
-      - name: Update branch
         run: |
-          git checkout ${{steps.extract_branch.outputs.branch}}
+          for branch in $(gh pr list --label update-once-a-day --state open --draft) 
+          do
+          git checkout $branch
           git config pull.rebase false
           git config --global user.name 'autoupdate-bot'
           git config --global user.email 'autoupdate-bot@xxxl.digital'
           git pull origin master -X ours
-
-      - name: Push changes
-        run: |
-          git checkout  ${{steps.extract_branch.outputs.branch}}
-          git config --global user.name 'autoupdate-bot'
-          git config --global user.email 'autoupdate-bot@xxxl.digital'
-          git push origin ${{steps.extract_branch.outputs.branch}}
-
- 
+          git push origin $branch
+          done
