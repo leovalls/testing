@@ -22,7 +22,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "primer hola mundo"
-          for prNumber in $(gh pr list --label update-once-a-day --state open --draft); do
+          for prNumber in $(gh pr list --label "update-once-a-day"); do
             echo "segundo hola mundo"
             echo "$prNumber"
             gh pr checkout $prNumber
