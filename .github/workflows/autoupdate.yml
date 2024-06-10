@@ -22,7 +22,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "primer hola mundo"
-          for prNumber in $(gh pr list --label "update-once-a-day"); do
+          for prNumber in $(gh pr list --label "update-once-a-day" --state open --draft); do
             echo "segundo hola mundo"
             echo "$prNumber"
             gh pr checkout $prNumber
@@ -31,6 +31,6 @@ jobs:
             git config pull.rebase false
             git config --global user.name 'autoupdate-bot'
             git config --global user.email 'autoupdate-bot@xxxl.digital'
-            git pull origin master -X ours
+            git pull origin main -X ours
             git push origin $branchName
           done
