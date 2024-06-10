@@ -22,13 +22,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "primer hola mundo"
-          for branch in $(gh pr list); do
+          for prNumber in $(gh pr list); do
             echo "segundo hola mundo"
-            echo "$branch"
-            git checkout $branch
-            git config pull.rebase false
-            git config --global user.name 'autoupdate-bot'
-            git config --global user.email 'autoupdate-bot@xxxl.digital'
-            git pull origin master -X ours
-            git push origin $branch
+            echo "$prNumber"
+            gh pr checkout $prNumber
+            branchName="$(git rev-parse --abbrev-ref HEAD)"
+            echo "branchName $branchName"
+            # git config pull.rebase false
+            # git config --global user.name 'autoupdate-bot'
+            # git config --global user.email 'autoupdate-bot@xxxl.digital'
+            # git pull origin master -X ours
+            # git push origin $branchName
           done
