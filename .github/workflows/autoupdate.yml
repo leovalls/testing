@@ -22,7 +22,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "primer hola mundo"
-          for branch in $(gh pr list --label update-once-a-day --state open --draft) do
+          for branch in $(gh pr list --label update-once-a-day --state open --draft); do
             echo "segundo hola mundo"
             echo "$branch"
             git checkout $branch
