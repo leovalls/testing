@@ -3,6 +3,7 @@ name: Autoupdate Branches
 on:
   schedule:
    - cron: '*/5 * * * *' 
+  pull_request:
 
 jobs:
   autoupdate:
@@ -16,11 +17,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Update labeled brances
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           for branch in $(gh pr list --label update-once-a-day --state open --draft) 
           do
