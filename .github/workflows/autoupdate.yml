@@ -23,6 +23,7 @@ jobs:
         run: |
           echo "primer hola mundo"
           branches=$(gh pr list --json headRefName --label "update-once-a-day" --state open);
-          for branchName in $branches; do
-            echo "branchName $branchName.headRefName"
+          for branchNames in $branches; do
+            branchName=$branchNames[0].headRefName
+            echo $branchName
           done
