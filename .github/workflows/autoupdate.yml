@@ -22,12 +22,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "primer hola mundo"
-          for branchName in $(gh pr list --json headRefName --label "update-once-a-day" --state open); do
-            echo "branchName $branchName"
-            git checkout $branches
-            git config pull.rebase false
-            git config --global user.name 'autoupdate-bot'
-            git config --global user.email 'autoupdate-bot@xxxl.digital'
-            git pull origin main -X ours
-            git push origin $branchName
+          branches=$(gh pr list --json headRefName --label "update-once-a-day" --state open);
+          for branchName in $branches do
+            echo "branchName $branchName.headRefName"
           done
