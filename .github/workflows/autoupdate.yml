@@ -3,6 +3,7 @@ name: Autoupdate Branches
 on:
   schedule:
    - cron: '*/5 * * * *' 
+  pull_request:
 
 jobs:
   autoupdate:
@@ -13,21 +14,23 @@ jobs:
       pull-requests: write
 
     steps:      
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4        
         with:
           fetch-depth: 0
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Update labeled brances
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          for branch in $(gh pr list --label update-once-a-day --state open --draft) 
-          do
-          git checkout $branch
-          git config pull.rebase false
-          git config --global user.name 'autoupdate-bot'
-          git config --global user.email 'autoupdate-bot@xxxl.digital'
-          git pull origin master -X ours
-          git push origin $branch
+          branches=$(gh pr list --json headRefName --label "update-once-a-day" --state open | jq '.[].headRefName');
+          for branchName in $branches; do
+            cleanBranchName=${branchName//\"/}
+            echo "Updating $cleanBranchName"
+            git checkout $cleanBranchName
+            git config pull.rebase false
+            git config --global user.name 'autoupdate-bot'
+            git config --global user.email 'autoupdate-bot@xxxl.digital'
+            git pull origin main -X ours
+            git push origin $cleanBranchName
           done
