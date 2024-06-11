@@ -22,8 +22,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "primer hola mundo"
-          echo "branches=gh pr list --json headRefName --label "update-once-a-day" --state open"
-          for branchName in $branches; do
+          for branchName in $(gh pr list --json headRefName --label "update-once-a-day" --state open); do
             echo "branchName $branchName"
             git checkout $branches
             git config pull.rebase false
